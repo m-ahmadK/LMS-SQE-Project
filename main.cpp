@@ -5,6 +5,7 @@
 #include <ctime>
 #include <vector>
 #include <cctype>
+#include <cstdlib>
 
 // Platform-Specific Configuration
 #ifdef _WIN32
@@ -14,7 +15,6 @@
 #else
     #include <unistd.h>
     #define CLS() system("clear")
-    // Stub definitions for Linux execution
     inline int getch() { return getchar(); }
 #endif
 
@@ -99,7 +99,20 @@ public:
         idCounter = 0;
     }
 
-    // Forward declarations to ensure visibility across methods
+    // Destructor to cleanly free linked list memory out of heap allocations
+    ~Library() {
+        while (head != NULL) {
+            Node* nextNode = head->next;
+            delete head;
+            head = nextNode;
+        }
+        while (Head != NULL) {
+            Rent* nextRent = Head->next;
+            delete Head;
+            Head = nextRent;
+        }
+    }
+
     void menu();
     void adminMenu();
     void userMenu();
@@ -209,61 +222,63 @@ void Library::IdCounter() {
 }
 
 void Library::userMenu() {
-    cout << "\t\t\t------------------------------------------------------" << endl;
-    cout << "\t\t\t--------------- Welcome to User's Menu ----------------" << endl;
-    cout << "\t\t\t------------------------------------------------------" << endl;
-    cout << "\t\t1. View All Books" << endl;
-    cout << "\t\t2. Search Books" << endl;
-    cout << "\t\t3. Rent Book" << endl;
-    cout << "\t\t4. Back to Main Menu" << endl;
-    cout << "\t\tEnter your choice : ";
+    while (true) {
+        cout << "\t\t\t------------------------------------------------------" << endl;
+        cout << "\t\t\t--------------- Welcome to User's Menu ----------------" << endl;
+        cout << "\t\t\t------------------------------------------------------" << endl;
+        cout << "\t\t1. View All Books" << endl;
+        cout << "\t\t2. Search Books" << endl;
+        cout << "\t\t3. Rent Book" << endl;
+        cout << "\t\t4. Back to Main Menu" << endl;
+        cout << "\t\tEnter your choice : ";
 
-    int choice;
-    if (!(cin >> choice) || choice < 1 || choice > 4) {
-        cout << "\nInvalid input! Returning to main menu." << endl;
-        cin.clear();
-        cin.ignore(10000, '\n');
-        menu();
-        return;
-    }
-    switch (choice) {
-        case 1: View_All_Books(); break;
-        case 2: SearchBook(); break;
-        case 3: rentABook(); break;
-        case 4: menu(); break;
+        int choice;
+        if (!(cin >> choice) || choice < 1 || choice > 4) {
+            cout << "Invalid choice! Try again." << endl;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
+        switch (choice) {
+            case 1: View_All_Books(); break;
+            case 2: SearchBook(); break;
+            case 3: rentABook(); break;
+            case 4: return; // Escapes clean to main loop execution context
+        }
     }
 }
 
 void Library::adminMenu() {
-    cout << "\t\t\t------------------------------------------------------" << endl;
-    cout << "\t\t\t--------------- Welcome to Admin's Menu ---------------" << endl;
-    cout << "\t\t\t------------------------------------------------------" << endl;
-    cout << "\t\t1. Add Books" << endl;
-    cout << "\t\t2. Modify Books" << endl;
-    cout << "\t\t3. View All Books" << endl;
-    cout << "\t\t4. Search Books" << endl;
-    cout << "\t\t5. Rent Book" << endl;
-    cout << "\t\t6. View Rent Books" << endl;
-    cout << "\t\t7. Back to Main Menu" << endl;
-    cout << "\t\tEnter your choice : ";
+    while (true) {
+        cout << "\t\t\t------------------------------------------------------" << endl;
+        cout << "\t\t\t--------------- Welcome to Admin's Menu ---------------" << endl;
+        cout << "\t\t\t------------------------------------------------------" << endl;
+        cout << "\t\t1. Add Books" << endl;
+        cout << "\t\t2. Modify Books" << endl;
+        cout << "\t\t3. View All Books" << endl;
+        cout << "\t\t4. Search Books" << endl;
+        cout << "\t\t5. Rent Book" << endl;
+        cout << "\t\t6. View Rent Books" << endl;
+        cout << "\t\t7. Back to Main Menu" << endl;
+        cout << "\t\tEnter your choice : ";
 
-    int choice;
-    if (!(cin >> choice) || choice < 1 || choice > 7) {
-        cout << "\nInvalid input! Returning to main menu." << endl;
-        cin.clear();
-        cin.ignore(10000, '\n');
-        menu();
-        return;
-    }
+        int choice;
+        if (!(cin >> choice) || choice < 1 || choice > 7) {
+            cout << "Invalid choice! Try again." << endl;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
 
-    switch (choice) {
-        case 1: AddBook(); break;
-        case 2: ModifyBooks(); break;
-        case 3: View_All_Books(); break;
-        case 4: SearchBook(); break;
-        case 5: rentABook(); break;
-        case 6: ViewRentBooks(); break;       
-        case 7: menu(); break;    
+        switch (choice) {
+            case 1: AddBook(); break;
+            case 2: ModifyBooks(); break;
+            case 3: View_All_Books(); break;
+            case 4: SearchBook(); break;
+            case 5: rentABook(); break;
+            case 6: ViewRentBooks(); break;       
+            case 7: return; // Clears stack context cleanly
+        }
     }
 }
 
@@ -278,14 +293,14 @@ void Library::AddBook() {
     do {
         cout << "\t\t\t--------------------------------------------------" << endl;
         cout << "\t\t\t------------------Book Category-------------------" << endl;
-        cout << "\t\t\t------------------Book Category-------------------" << endl;
+        cout << "\t\t\t--------------------------------------------------" << endl;
 
         int choice;
         cout << "Please select the book Category\n1: Computer Science\n2: History \n3: GeoGraphy \n4: Busniess & Law \n5: Fiction \n6: Non-Fiction \n7: Art & Design" << endl;
         if (!(cin >> choice) || choice < 1 || choice > 7) {
             cin.clear();
             cin.ignore(10000, '\n');
-            choice = 1; // Default fallback
+            choice = 1; 
         }
         
         if (choice == 1) category = "Computer Science";
@@ -361,7 +376,6 @@ void Library::AddBook() {
         cout << "\nDo you want to ADD another book \n PLEASE ANSWER IN 'Y' or 'N': ";
         cin >> choiceChar;
     } while (choiceChar == 'y' || choiceChar == 'Y');
-    adminMenu();
 }
     
 void Library::ModifyBooks() {
@@ -377,7 +391,6 @@ void Library::ModifyBooks() {
         
         if (head == NULL) {
             cout << "No books available to modify." << endl;
-            adminMenu();
             return;
         }
 
@@ -454,7 +467,6 @@ void Library::ModifyBooks() {
         cout << "\nDo you want to try again/modify book again (Y/N): ";
         cin >> choiceChar;
     } while (choiceChar == 'y' || choiceChar == 'Y');
-    adminMenu();
 }
     
 void Library::View_All_Books() {
@@ -469,10 +481,6 @@ void Library::View_All_Books() {
              << "\nCategory: " << temp->category << "\nAddition: " << temp->addition << "\nQuantity: " << temp->Quantity << endl;
         temp = temp->next;
     }
-    
-    cout << "\nPress any key to go back to Menu...";
-    getch();
-    menu();
 }
 
 void Library::SearchByCategory() {
@@ -587,7 +595,6 @@ void Library::SearchBook() {
         cout << "\nDo you want to SEARCH another book (Y/N): ";
         cin >> choiceChar;
     } while (choiceChar == 'Y' || choiceChar == 'y');
-    menu();
 }
 
 void Library::handleBookRental(string BookName, int BookId) {
@@ -595,9 +602,7 @@ void Library::handleBookRental(string BookName, int BookId) {
     cout << "Do you want to Rent this Book? (Y/N): ";
     cin >> check;
 
-    if (check == 'N' || check == 'n') {
-        menu();
-    } else if (check == 'Y' || check == 'y') {
+    if (check == 'Y' || check == 'y') {
         rentForm(BookName, BookId);
     }
 }
@@ -635,7 +640,6 @@ void Library::rentABook() {
         handleBookRental(BookName, Id);
     } else {
         cout << "Book ID not found." << endl;
-        menu();
     }
 }
 
@@ -654,7 +658,6 @@ void Library::ViewRentBooks() {
     }
     cout << "\nPress any key to return to Admin Menu...";
     getch();
-    adminMenu();
 }
 
 string currentDate() {
@@ -745,7 +748,6 @@ void Library::rentForm(string BookName, int BookId) {
         temp->next = newRent;
     }
     
-    // Decrement the book structure inventory count smoothly
     Node* bTemp = head;
     while (bTemp != NULL) {
         if (bTemp->id == BookId) {
@@ -756,9 +758,6 @@ void Library::rentForm(string BookName, int BookId) {
     }
 
     cout << "\t\t\tPlease! Return the Book within the " << days << " days" << endl;
-    cout << "\nPress any key to continue...";
-    getch();
-    menu();
 }
 
 void Library::menu() {
@@ -780,9 +779,11 @@ void Library::menu() {
             string adminPassword;
             string adminusername;
             cout << "\t\tEnter Username: ";
-            cin >> adminusername;
+            cin.ignore(10000, '\n'); // Flushes menu trailing newlines cleanly
+            getline(cin, adminusername);
             cout << "\t\tEnter password: ";
-            cin >> adminPassword;
+            getline(cin, adminPassword);
+            
             if (adminusername == ADMIN_NAME && adminPassword == ADMIN_PASSWORD) {
                 adminMenu();
             } else {
