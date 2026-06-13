@@ -100,8 +100,8 @@ class TestAdminLogin(unittest.TestCase):
         assert_output_contains(self, out, "Invalid Username OR Password", "ATC-003")
 
     def test_empty_credentials(self):
-        """ATC-004: Empty credentials rejected."""
-        out = run_lms("1\n \n \n3\n")
+        """ATC-004: Empty credentials rejected without causing streaming timeout hang."""
+        out = run_lms("1\n\n\n3\n")
         assert_output_contains(self, out, "Invalid Username OR Password", "ATC-004")
 
 
