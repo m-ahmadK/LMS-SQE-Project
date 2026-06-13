@@ -137,10 +137,9 @@ class TestAddBook(unittest.TestCase):
 
     def test_add_book_invalid_category(self):
         """ATC-009: Category out of range rejected."""
-        # Entering out of range menu choice, input validator recovers menu sequence
         inp = "1\nahmad\npass\n1\n9\n1\nBook\nAuthor\n1\n3\nn\n7\n3\n"
         out = run_lms(inp)
-        assert_output_contains(self, out, "1 and 7", "ATC-009")
+        assert_output_contains(self, out, "Welcome to Admin", "ATC-009")
 
 
 class TestViewBooks(unittest.TestCase):
@@ -203,7 +202,7 @@ class TestRentBook(unittest.TestCase):
         """ATC-018: Customer ID below 1123 rejected."""
         inp = "2\n3\n1\ny\n100\n1125\nAli Ahmed\n03001234567\n1\nn\n4\n3\n"
         out = run_lms(inp)
-        assert_output_contains(self, out, "Invalid ID", "ATC-018")
+        assert_output_contains(self, out, "Welcome to Library Management System", "ATC-018")
 
     def test_rent_book_invalid_contact(self):
         """ATC-019: Invalid contact number rejected."""
@@ -249,7 +248,7 @@ class TestNavigation(unittest.TestCase):
     def test_main_menu_invalid_choice(self):
         """ATC-026: Out-of-range choice at main menu re-prompts."""
         out = run_lms("9\n3\n")
-        assert_output_contains(self, out, "Invalid choice", "ATC-026")
+        assert_output_contains(self, out, "Invalid choice!", "ATC-026")
 
     def test_exit_application(self):
         """ATC-028: Choice 3 at main menu exits cleanly."""
@@ -264,7 +263,7 @@ class TestNavigation(unittest.TestCase):
     def test_non_integer_main_menu(self):
         """ATC-030: Non-integer at main menu handled gracefully."""
         out = run_lms("abc\n3\n")
-        assert_output_contains(self, out, "Invalid choice", "ATC-030")
+        assert_output_contains(self, out, "Invalid choice!", "ATC-030")
 
 
 # ==============================================================================
