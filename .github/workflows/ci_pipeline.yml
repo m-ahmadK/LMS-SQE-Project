@@ -1,0 +1,52 @@
+name: LMS SQE CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y g++ libgtest-dev cmake python3 python3-pip
+          cd /usr/src/gtest && sudo cmake . && sudo make
+          sudo cp lib/libgtest*.a /usr/lib/
+          pip3 install pytest pytest-html
+
+      - name: Compile LMS application
+        run: |
+          # Remove Windows-specific headers for Linux compilation
+          sed -i 's/#include<windows.h>//g' main.cpp
+          sed -i 's/#include<conio.h>//g' main.cpp
+          sed -i 's/boolean/bool/g' main.cpp
+          sed -i 's/system("cls");//g' main.cpp
+          sed -i 's/getch()/getchar()/g' main.cpp
+          g++ -std=c++11 -o LMS main.cpp
+          echo "Compilation successful"
+
+      - name: Run Python automation tests
+        run: |
+          echo "Clean Code,Robert Martin,Computer Science,1,1,5" > LMS.txt
+          echo "Design Patterns,GoF,Computer Science,2,1,3" >> LMS.txt
+          echo "" > RentBook.txt
+          python3 -m pytest automation_tests.py -v \
+            --html=test_report.html \
+            --self-contained-html \
+            --tb=short
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-report
+          path: test_report.html
+          retention-days: 30
